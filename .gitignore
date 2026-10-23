@@ -1,0 +1,5 @@
+desktop/**/bin/
+desktop/**/obj/
+desktop/**/*.csproj.user
+.vs/
+publish/

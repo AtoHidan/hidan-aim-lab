@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171a17">
+  <title>HIDAN | Aim Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f0f1e9;
+      --muted: #939b8d;
+      --dim: #687064;
+      --surface: #1d211d;
+      --surface-2: #242923;
+      --surface-3: #2c322b;
+      --line: #363d35;
+      --lime: #c6f36a;
+      --lime-dark: #8ebd37;
+      --coral: #fa795f;
+      --sky: #79cde0;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: "Segoe UI Variable", "Segoe UI", sans-serif;
+      font-family: var(--sans);
+      background: #171a17;
+      color: var(--ink);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: linear-gradient(132deg, #1c211b 0%, #151815 47%, #191d19 100%);
+    }
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      opacity: .62;
+      background-image:
+        repeating-radial-gradient(ellipse at 0% 44%, transparent 0 35px, rgba(198,243,106,.045) 36px 37px, transparent 38px 73px),
+        repeating-radial-gradient(ellipse at 100% 72%, transparent 0 42px, rgba(121,205,224,.04) 43px 44px, transparent 45px 87px);
+      mask-image: linear-gradient(90deg, #000 0%, transparent 38%, transparent 62%, #000 100%);
+    }
+    body::after {
+      opacity: .34;
+      background-image:
+        linear-gradient(rgba(225,236,216,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(225,236,216,.025) 1px, transparent 1px),
+        linear-gradient(115deg, transparent 0 49.9%, rgba(198,243,106,.045) 50%, transparent 50.1%);
+      background-size: 72px 72px, 72px 72px, 100% 100%;
+    }
+    button, select, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+    .app-shell { position: relative; z-index: 1; max-width: 1680px; min-height: 100vh; margin: 0 auto; padding: 0 34px 28px; }
+    .topbar { min-height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 220px; }
+    .brand-mark { width: 34px; height: 34px; border: 1px solid var(--lime); color: var(--lime); display: grid; place-items: center; font-size: 13px; font-weight: 800; letter-spacing: 0; transform: rotate(-4deg); }
+    .brand-name { font-size: 15px; line-height: 1; font-weight: 800; letter-spacing: .13em; }
+    .brand-sub { color: var(--muted); font-size: 10px; margin-top: 5px; letter-spacing: .14em; text-transform: uppercase; }
+    .top-meta { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: 12px; }
+    .local-chip { color: var(--lime); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: .1em; font-size: 10px; font-weight: 700; }
+    .local-chip::before { content: ""; width: 6px; height: 6px; background: var(--lime); border-radius: 50%; box-shadow: 0 0 12px rgba(198,243,106,.7); }
+    .top-divider { height: 22px; border-left: 1px solid var(--line); }
+    .top-link { border: 0; background: none; color: var(--muted); padding: 8px 0; cursor: pointer; }
+    .top-link:hover { color: var(--ink); }
+    .page-heading { display: flex; align-items: end; justify-content: space-between; padding: 34px 0 26px; gap: 24px; }
+    .eyebrow { color: var(--lime); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .17em; }
+    h1 { font-family: var(--serif); font-size: clamp(32px, 4vw, 46px); font-weight: 400; letter-spacing: 0; margin: 8px 0 0; line-height: 1.05; }
+    .heading-note { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 260px; text-align: right; }
+    .layout { display: grid; grid-template-columns: 218px minmax(350px, 1fr) 218px; gap: 22px; align-items: stretch; }
+    .rail { border-top: 1px solid var(--line); padding-top: 17px; }
+    .section-label { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 13px; }
+    .mode-list { display: grid; gap: 7px; }
+    .mode-button { position: relative; display: grid; grid-template-columns: 35px 1fr auto; align-items: center; gap: 10px; text-align: left; width: 100%; min-height: 61px; border: 1px solid transparent; background: rgba(36,41,35,.62); padding: 9px 10px; cursor: pointer; transition: border-color .18s, background .18s, transform .18s; }
+    .mode-button:hover { border-color: #59644d; transform: translateX(2px); }
+    .mode-button[aria-pressed="true"] { border-color: rgba(198,243,106,.66); background: rgba(198,243,106,.09); }
+    .mode-icon { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid var(--line); color: var(--lime); font-family: var(--serif); font-size: 17px; }
+    .mode-title { font-size: 12px; font-weight: 700; }
+    .mode-copy { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .mode-key { color: var(--dim); font-size: 9px; align-self: start; padding-top: 3px; }
+    .control-block { border-top: 1px solid var(--line); margin-top: 23px; padding-top: 18px; }
+    .select-wrap { position: relative; }
+    select { width: 100%; border: 1px solid var(--line); border-radius: 0; color: var(--ink); background: var(--surface-2); padding: 11px 32px 11px 12px; appearance: none; font-size: 12px; cursor: pointer; }
+    .select-wrap::after { content: "⌄"; position: absolute; right: 12px; top: 8px; color: var(--muted); pointer-events: none; }
+    .field-label { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 11px; }
+    .field-value { color: var(--ink); font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: var(--lime); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: var(--dim); font-size: 9px; margin-top: 5px; }
+    .crosshair-style-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .crosshair-style-button { min-width: 0; min-height: 35px; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); font-size: 17px; cursor: pointer; }
+    .crosshair-style-button:hover { color: var(--ink); border-color: #6b7664; }
+    .crosshair-style-button[aria-pressed="true"] { color: var(--lime); border-color: var(--lime); background: rgba(198,243,106,.08); }
+    .crosshair-color-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .color-swatches { display: flex; align-items: center; gap: 8px; }
+    .color-swatch { width: 20px; height: 20px; border: 2px solid #171a17; border-radius: 50%; background: var(--swatch-color); cursor: pointer; box-shadow: 0 0 0 1px var(--line); }
+    .color-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
+    .custom-color-picker { width: 24px; height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+    .custom-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .custom-color-picker::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 50%; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; min-height: 30px; margin-top: 10px; color: var(--muted); font-size: 11px; }
+    .toggle-row input { width: 16px; height: 16px; accent-color: var(--lime); cursor: pointer; }
+    .toggle-row input:disabled, input[type="range"]:disabled { cursor: not-allowed; opacity: .45; }
+    .key-hint { margin-top: 26px; padding: 12px 0 0; border-top: 1px solid var(--line); color: var(--dim); font-size: 10px; line-height: 1.6; }
+    kbd { font: inherit; color: var(--muted); border: 1px solid var(--line); padding: 2px 5px; margin: 0 2px; }
+    .practice { min-width: 0; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; min-height: 39px; margin-bottom: 11px; }
+    .practice-title { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; }
+    .practice-title .live-dot { width: 7px; height: 7px; background: var(--dim); border-radius: 50%; }
+    .practice-title.active .live-dot { background: var(--coral); box-shadow: 0 0 10px rgba(250,121,95,.7); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .4; } }
+    .arena-info { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .arena-info strong { color: var(--ink); font-variant-numeric: tabular-nums; font-size: 12px; letter-spacing: 0; }
+    .arena-frame { position: relative; overflow: hidden; min-height: 430px; height: min(60vh, 600px); border: 1px solid #434b3e; background: #141714; box-shadow: 0 18px 60px rgba(0,0,0,.22); }
+    .arena-frame.resizable { resize: both; overflow: auto; min-width: 320px; min-height: 320px; max-width: 100%; max-height: 80vh; }
+    .arena-frame::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,.22) 100%), repeating-linear-gradient(0deg, transparent 0 43px, rgba(198,243,106,.035) 44px), repeating-linear-gradient(90deg, transparent 0 43px, rgba(198,243,106,.035) 44px); }
+    #arena { display: block; width: 100%; height: 100%; cursor: none; touch-action: manipulation; }
+    .arena-overlay { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 22px; background: rgba(15,18,15,.42); text-align: center; }
+    .arena-overlay[hidden] { display: none; }
+    .overlay-content { max-width: 300px; animation: arrive .35s ease-out both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .overlay-kicker { color: var(--lime); font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    .overlay-title { font: 400 38px/1.05 var(--serif); margin: 10px 0 9px; }
+    .overlay-copy { color: #b4b9ae; font-size: 12px; line-height: 1.6; margin: 0 auto 19px; }
+    .primary-button { min-height: 42px; border: 0; background: var(--lime); color: #1b2114; padding: 0 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; cursor: pointer; transition: background .16s, transform .16s; }
+    .primary-button:hover { background: #d6ff8a; transform: translateY(-1px); }
+    .secondary-button { min-height: 36px; border: 1px solid var(--line); background: transparent; color: var(--muted); padding: 0 13px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .secondary-button:hover { color: var(--ink); border-color: #6b7664; }
+    .arena-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; }
+    .session-note { color: var(--dim); font-size: 10px; line-height: 1.4; }
+    .session-actions { display: flex; gap: 7px; }
+    .metrics { border-top: 1px solid var(--line); padding-top: 17px; }
+    .metric-hero { padding: 15px 0 19px; border-bottom: 1px solid var(--line); }
+    .metric-caption { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 9px; font-weight: 700; }
+    .metric-number { font-family: var(--serif); font-size: 48px; line-height: 1; margin-top: 9px; font-variant-numeric: tabular-nums; }
+    .metric-number small { font-family: var(--sans); font-size: 15px; color: var(--muted); }
+    .metric-sub { color: var(--dim); font-size: 10px; margin-top: 9px; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+    .metric-cell { padding: 15px 7px 14px 0; min-height: 76px; }
+    .metric-cell:nth-child(odd) { border-right: 1px solid var(--line); }
+    .metric-cell:nth-child(even) { padding-left: 13px; }
+    .metric-cell:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .metric-small-number { font-size: 21px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; margin-top: 7px; }
+    .metric-small-number.coral { color: var(--coral); }
+    .metric-small-number.sky { color: var(--sky); }
+    .best-line { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .best-value { color: var(--lime); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .leaderboard { padding: 16px 0 6px; border-bottom: 1px solid var(--line); }
+    .leaderboard-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+    .leaderboard-title { margin: 0; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .player-name { width: 92px; min-width: 0; padding: 6px 7px; border: 1px solid var(--line); border-radius: 0; background: var(--surface-2); color: var(--ink); font-size: 10px; }
+    .leaderboard-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+    .leaderboard-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 38px; border-top: 1px solid rgba(54,61,53,.62); }
+    .leaderboard-rank { color: var(--dim); font-size: 10px; font-variant-numeric: tabular-nums; }
+    .leaderboard-row:first-child .leaderboard-rank { color: var(--lime); }
+    .leaderboard-player { min-width: 0; overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .leaderboard-detail { color: var(--dim); font-size: 9px; margin-top: 3px; }
+    .leaderboard-score { color: var(--lime); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .leaderboard-empty { padding: 12px 0; color: var(--dim); font-size: 10px; line-height: 1.5; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .session-footer { margin-top: 20px; padding: 13px 0; color: var(--dim); font-size: 9px; line-height: 1.6; border-top: 1px solid var(--line); }
+    .session-footer strong { color: var(--muted); font-weight: 600; }
+    .toast { position: fixed; z-index: 5; bottom: 22px; left: 50%; transform: translate(-50%, 14px); opacity: 0; pointer-events: none; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 10px 14px; font-size: 11px; transition: opacity .2s, transform .2s; }
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+    @media (min-width: 1450px) { .layout { grid-template-columns: 240px minmax(480px, 1fr) 240px; gap: 28px; } .arena-frame { height: min(65vh, 680px); } }
+    @media (max-width: 1050px) { .app-shell { padding: 0 22px 24px; } .layout { grid-template-columns: 190px minmax(300px, 1fr); } .metrics { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; } .metrics > .section-label { grid-column: 1 / -1; margin-bottom: -6px; } .metric-hero, .metric-grid, .best-line { border-bottom: 0; border-right: 1px solid var(--line); padding-right: 16px; } .metric-grid { border-right: 1px solid var(--line); } .best-line { align-self: start; } .session-footer { grid-column: 1 / -1; margin-top: 0; } }
+    @media (max-width: 700px) { .app-shell { padding: 0 15px 20px; } .topbar { min-height: 65px; } .brand { min-width: auto; } .top-meta { gap: 12px; } .top-meta .top-divider, .top-link { display: none; } .page-heading { padding: 25px 0 20px; align-items: start; flex-direction: column; gap: 10px; } .heading-note { text-align: left; max-width: 360px; } .layout { grid-template-columns: 1fr; gap: 24px; } .practice { grid-row: 1; } .rail { grid-row: 2; } .metrics { grid-row: 3; grid-template-columns: 1fr 1fr; gap: 0 14px; } .metric-hero { border-right: 1px solid var(--line); } .metric-grid { border-right: 0; } .best-line { grid-column: 1 / -1; border-top: 1px solid var(--line); border-right: 0; padding-right: 0; } .session-footer { grid-column: 1 / -1; } .mode-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .mode-button { grid-template-columns: 1fr; align-content: start; min-height: 94px; gap: 6px; padding: 9px; } .mode-icon { width: 26px; height: 26px; } .mode-key { display: none; } .arena-frame { min-height: 340px; height: 56vh; } .practice-head { align-items: start; flex-direction: column; gap: 9px; padding: 4px 0; } .arena-bottom { align-items: start; flex-direction: column; } }
+    @media (max-width: 390px) { .arena-info { gap: 8px; font-size: 9px; } .arena-info strong { font-size: 11px; } .mode-title { font-size: 11px; } .mode-copy { font-size: 9px; } .metric-number { font-size: 42px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="HIDAN Aim Lab">
+        <div class="brand-mark" aria-hidden="true">H</div>
+        <div><div class="brand-name">HIDAN</div><div class="brand-sub">Aim Lab / 01</div></div>
+      </div>
+      <div class="top-meta"><span class="local-chip" id="localSession">Local session</span><span class="top-divider" aria-hidden="true"></span><button class="top-link" id="resetStats" type="button">Reset stats</button></div>
+    </header>
+
+    <section class="page-heading" aria-labelledby="pageTitle">
+      <div><div class="eyebrow" id="eyebrow">Training suite / fundamentals</div><h1 id="pageTitle">Stay on target.</h1></div>
+      <div class="heading-note" id="headingNote">A quiet space to tune your precision.<br>Every target is generated right here.</div>
+    </section>
+
+    <main class="layout">
+      <aside class="rail" id="practiceSetup" aria-label="Practice setup">
+        <h2 class="section-label" id="setupHeading">01 / Choose drill <span id="modeCount">3 modes</span></h2>
+        <div class="mode-list" role="group" aria-label="Training drill">
+          <button class="mode-button" type="button" data-mode="grid" aria-pressed="true"><span class="mode-icon" aria-hidden="true">+3</span><span><span class="mode-title">Gridshot</span><span class="mode-copy">Build speed</span></span><span class="mode-key">01</span></button>
+          <button class="mode-button" type="button" data-mode="micro" aria-pressed="false"><span class="mode-icon" aria-hidden="true">↗</span><span><span class="mode-title">Tracking</span><span class="mode-copy">Changing speed</span></span><span class="mode-key">02</span></button>
+          <button class="mode-button" type="button" data-mode="reflex" aria-pressed="false"><span class="mode-icon" aria-hidden="true">!</span><span><span class="mode-title">Reflex</span><span class="mode-copy">Beat the clock</span></span><span class="mode-key">03</span></button>
+        </div>
+        <div class="control-block">
+          <label class="section-label" id="durationHeading" for="duration">02 / Session length</label>
+          <div class="select-wrap"><select id="duration" aria-label="Session length"><option value="30">30 seconds</option><option value="60" selected>60 seconds</option><option value="90">90 seconds</option></select></div>
+        </div>
+        <div class="control-block">
+          <label class="section-label" id="languageHeading" for="languageSelect">Language</label>
+          <div class="select-wrap"><select id="languageSelect" aria-label="Language"><option value="en">English</option><option value="es">Español</option></select></div>
+          <label class="section-label" id="displayModeHeading" for="displayModeSelect" style="margin-top:14px">Display mode</label>
+          <div class="select-wrap"><select id="displayModeSelect" aria-label="Display mode"><option value="windowed">Windowed</option><option value="windowed-fullscreen" selected>Windowed fullscreen</option><option value="fullscreen">Fullscreen</option></select></div>
+          <label class="toggle-row" for="resizeArena"><span id="resizeArenaLabel">Resizable arena</span><input id="resizeArena" type="checkbox"></label>
+        </div>
+        <div class="control-block">
+          <label class="field-label" for="targetSize"><span id="targetSizeLabel">Target size</span><span class="field-value"><span id="sizeValue">28</span> px</span></label>
+          <input id="targetSize" type="range" min="16" max="42" value="28" aria-label="Target size">
+          <div class="range-ends"><span id="targetSmallLabel">Precise</span><span id="targetLargeLabel">Relaxed</span></div>
+        </div>
+        <div class="control-block">
+          <label class="field-label" for="mouseSensitivity"><span id="sensitivityLabel">Mouse sensitivity</span><span class="field-value" id="sensitivityValue">1.0x</span></label>
+          <input id="mouseSensitivity" type="range" min="0.5" max="8" step="0.1" value="1" aria-label="Mouse sensitivity">
+          <div class="range-ends"><span>0.5x</span><span>8.0x</span></div>
+        </div>
+        <div class="control-block" id="reflexSpeedControl" hidden>
+          <label class="field-label" for="reflexSpeed"><span id="reflexSpeedLabel">Marker speed</span><span class="field-value" id="reflexSpeedValue">1.0x</span></label>
+          <input id="reflexSpeed" type="range" min="0.5" max="2" step="0.1" value="1" aria-label="Reflex marker speed">
+          <div class="range-ends"><span>Slow</span><span>Fast</span></div>
+        </div>
+        <div class="control-block">
+          <h3 class="section-label" id="crosshairHeading">04 / Crosshair <span id="crosshairAppearance">appearance</span></h3>
+          <div class="crosshair-style-list" id="crosshairStyleGroup" role="group" aria-label="Crosshair style">
+            <button class="crosshair-style-button" type="button" data-crosshair-style="cross" aria-label="Cross style" aria-pressed="true">+</button>
+            <button class="crosshair-style-button" type="button" data-crosshair-style="dot" aria-label="Dot style" aria-pressed="false">&bull;</button>
+            <button class="crosshair-style-button" type="button" data-crosshair-style="ring" aria-label="Ring style" aria-pressed="false">&odot;</button>
+            <button class="crosshair-style-button" type="button" data-crosshair-style="x" aria-label="X style" aria-pressed="false">&times;</button>
+          </div>
+          <div class="crosshair-color-row">
+            <div class="color-swatches" id="crosshairColorGroup" role="group" aria-label="Crosshair color presets">
+              <button class="color-swatch" type="button" data-crosshair-color="#c6f36a" style="--swatch-color:#c6f36a" aria-label="Lime crosshair" aria-pressed="true"></button>
+              <button class="color-swatch" type="button" data-crosshair-color="#79cde0" style="--swatch-color:#79cde0" aria-label="Cyan crosshair" aria-pressed="false"></button>
+              <button class="color-swatch" type="button" data-crosshair-color="#fa795f" style="--swatch-color:#fa795f" aria-label="Coral crosshair" aria-pressed="false"></button>
+              <button class="color-swatch" type="button" data-crosshair-color="#f0f1e9" style="--swatch-color:#f0f1e9" aria-label="White crosshair" aria-pressed="false"></button>
+            </div>
+            <input class="custom-color-picker" id="customCrosshairColor" type="color" value="#c6f36a" aria-label="Custom crosshair color" title="Choose custom color">
+          </div>
+          <div class="control-block">
+              <label class="field-label" for="crosshairSize"><span id="crosshairSizeLabel">Crosshair size</span><span class="field-value" id="crosshairSizeValue">8 px</span></label>
+            <input id="crosshairSize" type="range" min="4" max="20" step="1" value="8" aria-label="Crosshair size">
+            <div class="range-ends"><span id="crosshairSmallLabel">Small</span><span id="crosshairLargeLabel">Large</span></div>
+          </div>
+          <div class="control-block">
+            <label class="field-label" for="crosshairGap"><span id="crosshairGapLabel">Crosshair gap</span><span class="field-value" id="crosshairGapValue">5 px</span></label>
+            <input id="crosshairGap" type="range" min="0" max="14" step="1" value="5" aria-label="Crosshair gap">
+            <div class="range-ends"><span id="crosshairClosedLabel">Closed</span><span id="crosshairOpenLabel">Open</span></div>
+          </div>
+          <label class="toggle-row" for="centerDot"><span id="centerDotLabel">Center dot</span><input id="centerDot" type="checkbox" checked></label>
+        </div>
+        <div class="key-hint"><kbd>Space</kbd> start / pause <span aria-hidden="true">&middot;</span> <kbd>R</kbd> restart</div>
+      </aside>
+
+      <section class="practice" id="practiceArea" aria-label="Target practice area">
+        <div class="practice-head">
+          <div class="practice-title" id="practiceStatus"><span class="live-dot" aria-hidden="true"></span><span id="statusText">READY WHEN YOU ARE</span></div>
+          <div class="arena-info"><span><span id="timeLabel">Time</span> <strong id="timeReadout">01:00</strong></span><span aria-hidden="true">/</span><span><span id="drillLabel">Drill</span> <strong id="modeReadout">Gridshot</strong></span></div>
+        </div>
+        <div class="arena-frame" id="arenaFrame">
+          <canvas id="arena" aria-label="Synthetic target practice canvas"></canvas>
+          <div class="arena-overlay" id="overlay">
+            <div class="overlay-content"><div class="overlay-kicker" id="overlayKicker">HIDAN / TRAINING BAY</div><h2 class="overlay-title" id="overlayTitle">Take your position.</h2><p class="overlay-copy" id="overlayCopy">Click the targets as they appear. Stay loose, keep your eyes ahead.</p><button class="primary-button" id="startButton" type="button">Start session</button></div>
+          </div>
+        </div>
+        <div class="arena-bottom"><div class="session-note" id="sessionNote">A session lasts one minute. Your best score stays on this device.</div><div class="session-actions"><button class="secondary-button" id="pauseButton" type="button" disabled>Pause</button><button class="secondary-button" id="restartButton" type="button">Restart</button></div></div>
+      </section>
+
+      <aside class="metrics" id="performanceArea" aria-label="Session performance">
+        <h2 class="section-label" id="performanceHeading">03 / Performance <span id="performanceThisSession">this session</span></h2>
+        <div class="metric-hero"><div class="metric-caption" id="accuracyLabel">Accuracy</div><div class="metric-number"><span id="accuracy">0</span><small>%</small></div><div class="metric-sub" id="accuracySub">Hits compared to total clicks</div></div>
+        <div class="metric-grid">
+          <div class="metric-cell"><div class="metric-caption" id="hitsLabel">Hits</div><div class="metric-small-number" id="hits">0</div></div>
+          <div class="metric-cell"><div class="metric-caption" id="missesLabel">Misses</div><div class="metric-small-number coral" id="misses">0</div></div>
+          <div class="metric-cell"><div class="metric-caption" id="reactionLabel">Avg. reaction</div><div class="metric-small-number sky"><span id="reaction">--</span><small id="reactionUnit"> ms</small></div></div>
+          <div class="metric-cell"><div class="metric-caption" id="streakLabel">Streak</div><div class="metric-small-number" id="streak">0</div></div>
+        </div>
+        <div class="best-line"><span id="personalBestLabel">Personal best</span><span class="best-value" id="bestScore">0 hits</span></div>
+        <section class="leaderboard" aria-labelledby="leaderboardTitle">
+          <div class="leaderboard-head"><h3 class="leaderboard-title" id="leaderboardTitle">Top 5 / Gridshot</h3><label class="sr-only" for="playerName">Player name</label><input class="player-name" id="playerName" maxlength="24" value="Player" aria-label="Player name"></div>
+          <ol class="leaderboard-list" id="leaderboardList" aria-live="polite"></ol>
+        </section>
+        <div class="session-footer"><strong id="offlineTitle">Offline by design.</strong><br><span id="offlineCopy">No game connection, capture, or external input. Just you and the targets.</span></div>
+      </aside>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (() => {
+      const canvas = document.getElementById('arena');
+      const context = canvas.getContext('2d');
+      const frame = document.getElementById('arenaFrame');
+      const overlay = document.getElementById('overlay');
+      const startButton = document.getElementById('startButton');
+      const pauseButton = document.getElementById('pauseButton');
+      const durationSelect = document.getElementById('duration');
+      const sizeInput = document.getElementById('targetSize');
+      const sensitivityInput = document.getElementById('mouseSensitivity');
+      const sensitivityValue = document.getElementById('sensitivityValue');
+      const reflexSpeedControl = document.getElementById('reflexSpeedControl');
+      const reflexSpeedInput = document.getElementById('reflexSpeed');
+      const reflexSpeedValue = document.getElementById('reflexSpeedValue');
+      const crosshairStyleButtons = [...document.querySelectorAll('.crosshair-style-button')];
+      const crosshairColorButtons = [...document.querySelectorAll('.color-swatch')];
+      const customCrosshairColor = document.getElementById('customCrosshairColor');
+      const crosshairSizeInput = document.getElementById('crosshairSize');
+      const crosshairSizeValue = document.getElementById('crosshairSizeValue');
+      const crosshairGapInput = document.getElementById('crosshairGap');
+      const crosshairGapValue = document.getElementById('crosshairGapValue');
+      const centerDotInput = document.getElementById('centerDot');
+      const languageSelect = document.getElementById('languageSelect');
+      const displayModeSelect = document.getElementById('displayModeSelect');
+      const resizeArenaInput = document.getElementById('resizeArena');
+      const playerNameInput = document.getElementById('playerName');
+      const leaderboardList = document.getElementById('leaderboardList');
+      const leaderboardTitle = document.getElementById('leaderboardTitle');
+      const modeButtons = [...document.querySelectorAll('.mode-button')];
+      const ui = {
+        time: document.getElementById('timeReadout'), mode: document.getElementById('modeReadout'),
+        status: document.getElementById('practiceStatus'), statusText: document.getElementById('statusText'),
+        accuracy: document.getElementById('accuracy'), hits: document.getElementById('hits'),
+        misses: document.getElementById('misses'), reaction: document.getElementById('reaction'),
+        streak: document.getElementById('streak'), best: document.getElementById('bestScore'),
+        accuracyLabel: document.getElementById('accuracyLabel'), accuracySub: document.getElementById('accuracySub'),
+        hitsLabel: document.getElementById('hitsLabel'), missesLabel: document.getElementById('missesLabel'),
+        reactionLabel: document.getElementById('reactionLabel'), reactionUnit: document.getElementById('reactionUnit'),
+        streakLabel: document.getElementById('streakLabel'),
+        leaderboardTitle, leaderboardList,
+        note: document.getElementById('sessionNote'), kicker: document.getElementById('overlayKicker'),
+        title: document.getElementById('overlayTitle'), copy: document.getElementById('overlayCopy'),
+        toast: document.getElementById('toast')
+      };
+      const translations = {
+        en: {
+          localSession: 'Local session', reset: 'Reset stats', eyebrow: 'Training suite / fundamentals',
+          pageTitle: 'Stay on target.', headingNote: 'A quiet space to tune your precision. Every target is generated right here.',
+          setupHeading: '01 / Choose drill', modeCount: '3 modes', gridshot: 'Gridshot', gridCopy: 'Build speed', tracking: 'Tracking', trackingCopy: 'Changing speed', reflex: 'Reflex', reflexCopy: 'Beat the clock',
+          duration: '02 / Session length', language: 'Language', displayMode: 'Display mode', resizable: 'Resizable arena', targetSize: 'Target size', precise: 'Precise', relaxed: 'Relaxed',
+          sensitivity: 'Mouse sensitivity', markerSpeed: 'Marker speed', slow: 'Slow', fast: 'Fast', crosshairHeading: '04 / Crosshair', appearance: 'appearance',
+          styleCross: 'Cross style', styleDot: 'Dot style', styleRing: 'Ring style', styleX: 'X style', colorLime: 'Lime crosshair', colorCyan: 'Cyan crosshair', colorCoral: 'Coral crosshair', colorWhite: 'White crosshair', customColor: 'Custom crosshair color',
+          crosshairSize: 'Crosshair size', small: 'Small', large: 'Large', crosshairGap: 'Crosshair gap', closed: 'Closed', open: 'Open', centerDot: 'Center dot',
+          ready: 'READY WHEN YOU ARE', live: 'SESSION LIVE', paused: 'SESSION PAUSED', completed: 'SESSION COMPLETE', time: 'Time', drill: 'Drill',
+          kicker: 'HIDAN / TRAINING BAY', overlayTitle: 'Take your position.', overlayCopy: 'Click the targets as they appear. Stay loose, keep your eyes ahead.', start: 'Start session', runAgain: 'Run it back',
+          sessionNote: 'A session lasts {duration} seconds. Your best score stays on this device.', trackingCopyLong: 'Follow the target as it changes speed and roams across the full arena. No clicks needed.', trackingNote: 'Variable speed. The target can roam edge to edge across the full practice area.',
+          pause: 'Pause', resume: 'Resume', restart: 'Restart', pauseTitle: 'Paused.', pauseCopy: 'Your targets and session clock are on hold.',
+          performance: '03 / Performance', thisSession: 'this session', accuracy: 'Accuracy', trackingAccuracy: 'Tracking accuracy', accuracyClicks: 'Hits compared to total clicks', accuracyTracking: 'Share of active time spent on target', hits: 'Hits', onTarget: 'On target', misses: 'Misses', offTarget: 'Off target', avgReaction: 'Avg. reaction', bestTrack: 'Best track', streak: 'Streak', currentTrack: 'Current track', personalBest: 'Personal best',
+          topFive: 'Top 5 / {mode}', playerName: 'Player name', playerFallback: 'Player', emptyLeaderboard: 'Finish a session to add a score.', leaderDetail: '{accuracy}% accuracy · {misses} misses · {reaction} ms avg', leaderTrackingDetail: '{accuracy}% accuracy · {misses} s off target', offlineTitle: 'Offline by design.', offlineCopy: 'No game connection, capture, or external input. Just you and the targets.', nativeDisplayOnly: 'Display modes are available in the HIDAN desktop app.',
+          trackingResult: '{accuracy}% tracking.', trackingSummary: 'You stayed on target for {time} seconds. Best continuous track: {streak} seconds.', clickResult: '{hits} hits. {accuracy}%', clickSummary: 'You held a {streak}-target best streak. Take a breath, then run it back.',
+          clearToast: 'Personal best cleared', modeResetToast: '{mode} selected. Current session reset.',
+          duration30: '30 seconds', duration60: '60 seconds', duration90: '90 seconds', modeWindowed: 'Windowed', modeBorderless: 'Windowed fullscreen', modeFullscreen: 'Fullscreen',
+          keyHint: '<kbd>Space</kbd> start / pause <span aria-hidden="true">·</span> <kbd>R</kbd> restart',
+          colorPresets: 'Crosshair color presets', crosshairStyles: 'Crosshair styles', practiceSetup: 'Practice setup', practiceArea: 'Target practice area', performanceArea: 'Session performance'
+        },
+        es: {
+          localSession: 'Sesión local', reset: 'Reiniciar estadísticas', eyebrow: 'Entrenamiento / fundamentos',
+          pageTitle: 'Mantén la mira.', headingNote: 'Un espacio tranquilo para afinar tu precisión. Cada objetivo se genera aquí.',
+          setupHeading: '01 / Elige ejercicio', modeCount: '3 modos', gridshot: 'Ráfaga', gridCopy: 'Gana velocidad', tracking: 'Seguimiento', trackingCopy: 'Velocidad variable', reflex: 'Reflejos', reflexCopy: 'Contra reloj',
+          duration: '02 / Duración', language: 'Idioma', displayMode: 'Modo de pantalla', resizable: 'Arena redimensionable', targetSize: 'Tamaño del objetivo', precise: 'Preciso', relaxed: 'Amplio',
+          sensitivity: 'Sensibilidad del ratón', markerSpeed: 'Velocidad del marcador', slow: 'Lento', fast: 'Rápido', crosshairHeading: '04 / Mira', appearance: 'apariencia',
+          styleCross: 'Mira en cruz', styleDot: 'Punto', styleRing: 'Anillo', styleX: 'Mira en X', colorLime: 'Mira lima', colorCyan: 'Mira cian', colorCoral: 'Mira coral', colorWhite: 'Mira blanca', customColor: 'Color personalizado de mira',
+          crosshairSize: 'Tamaño de mira', small: 'Pequeño', large: 'Grande', crosshairGap: 'Separación de mira', closed: 'Cerrada', open: 'Abierta', centerDot: 'Punto central',
+          ready: 'PREPARADO CUANDO QUIERAS', live: 'SESIÓN EN CURSO', paused: 'SESIÓN EN PAUSA', completed: 'SESIÓN COMPLETADA', time: 'Tiempo', drill: 'Modo',
+          kicker: 'HIDAN / ZONA DE PRÁCTICA', overlayTitle: 'A punto.', overlayCopy: 'Haz clic en los objetivos cuando aparezcan. Relaja la mano y mantén la vista al frente.', start: 'Iniciar sesión', runAgain: 'Repetir',
+          sessionNote: 'La sesión dura {duration} segundos. Tu mejor marca se guarda en este dispositivo.', trackingCopyLong: 'Sigue el objetivo mientras cambia de velocidad y recorre toda la arena. No hace falta hacer clic.', trackingNote: 'Velocidad variable. El objetivo puede recorrer toda la zona de práctica.',
+          pause: 'Pausa', resume: 'Continuar', restart: 'Reiniciar', pauseTitle: 'En pausa.', pauseCopy: 'Los objetivos y el cronómetro están detenidos.',
+          performance: '03 / Rendimiento', thisSession: 'esta sesión', accuracy: 'Precisión', trackingAccuracy: 'Precisión de seguimiento', accuracyClicks: 'Aciertos comparados con clics', accuracyTracking: 'Porcentaje del tiempo sobre el objetivo', hits: 'Aciertos', onTarget: 'Sobre objetivo', misses: 'Fallos', offTarget: 'Fuera del objetivo', avgReaction: 'Reacción media', bestTrack: 'Mejor seguimiento', streak: 'Racha', currentTrack: 'Racha actual', personalBest: 'Mejor marca',
+          topFive: 'Top 5 / {mode}', playerName: 'Nombre del jugador', playerFallback: 'Jugador', emptyLeaderboard: 'Completa una sesión para guardar una marca.', leaderDetail: '{accuracy}% precisión · {misses} fallos · {reaction} ms media', leaderTrackingDetail: '{accuracy}% precisión · {misses} s fuera del objetivo', offlineTitle: 'Diseñado para jugar sin conexión.', offlineCopy: 'Sin conexión con otros juegos, capturas ni entrada externa. Solo tú y los objetivos.', nativeDisplayOnly: 'Los modos de pantalla están disponibles en la aplicación de escritorio HIDAN.',
+          trackingResult: '{accuracy}% de seguimiento.', trackingSummary: 'Seguiste el objetivo durante {time} s. Mejor racha continua: {streak} s.', clickResult: '{hits} aciertos. {accuracy}%', clickSummary: 'Mejor racha: {streak} objetivos. Respira y vuelve a intentarlo.',
+          clearToast: 'Mejor marca eliminada', modeResetToast: '{mode} seleccionado. Sesión actual reiniciada.',
+          duration30: '30 segundos', duration60: '60 segundos', duration90: '90 segundos', modeWindowed: 'Ventana', modeBorderless: 'Ventana sin bordes', modeFullscreen: 'Pantalla completa',
+          keyHint: '<kbd>Espacio</kbd> iniciar / pausar <span aria-hidden="true">·</span> <kbd>R</kbd> reiniciar',
+          colorPresets: 'Colores de mira', crosshairStyles: 'Estilos de mira', practiceSetup: 'Configuración de práctica', practiceArea: 'Zona de práctica', performanceArea: 'Rendimiento de la sesión'
+        }
+      };
+      function tr(key, values = {}) {
+        let result = translations[language]?.[key] || translations.en[key] || key;
+        for (const [name, value] of Object.entries(values)) result = result.replace(`{${name}}`, value);
+        return result;
+      }
+      function setText(id, key) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = tr(key);
+      }
+      function modeLabel(mode) { return tr(mode === 'grid' ? 'gridshot' : mode === 'micro' ? 'tracking' : 'reflex'); }
+      function updateMetricLabels() {
+        const trackingMode = selectedMode === 'micro';
+        ui.accuracyLabel.textContent = tr(trackingMode ? 'trackingAccuracy' : 'accuracy');
+        ui.accuracySub.textContent = tr(trackingMode ? 'accuracyTracking' : 'accuracyClicks');
+        ui.hitsLabel.textContent = tr(trackingMode ? 'onTarget' : 'hits');
+        ui.missesLabel.textContent = tr(trackingMode ? 'offTarget' : 'misses');
+        ui.reactionLabel.textContent = tr(trackingMode ? 'bestTrack' : 'avgReaction');
+        ui.streakLabel.textContent = tr(trackingMode ? 'currentTrack' : 'streak');
+      }
+      function applyLanguage() {
+        document.documentElement.lang = language;
+        for (const [id, key] of [
+          ['localSession', 'localSession'], ['resetStats', 'reset'], ['eyebrow', 'eyebrow'], ['pageTitle', 'pageTitle'],
+          ['headingNote', 'headingNote'], ['modeCount', 'modeCount'], ['durationHeading', 'duration'],
+          ['languageHeading', 'language'], ['displayModeHeading', 'displayMode'], ['resizeArenaLabel', 'resizable'],
+          ['reflexSpeedLabel', 'markerSpeed'],
+          ['targetSizeLabel', 'targetSize'], ['targetSmallLabel', 'precise'], ['targetLargeLabel', 'relaxed'],
+          ['sensitivityLabel', 'sensitivity'], ['crosshairAppearance', 'appearance'],
+          ['crosshairSizeLabel', 'crosshairSize'], ['crosshairSmallLabel', 'small'], ['crosshairLargeLabel', 'large'],
+          ['crosshairGapLabel', 'crosshairGap'], ['crosshairClosedLabel', 'closed'], ['crosshairOpenLabel', 'open'],
+          ['centerDotLabel', 'centerDot'], ['timeLabel', 'time'], ['drillLabel', 'drill'],
+          ['personalBestLabel', 'personalBest'], ['performanceThisSession', 'thisSession'],
+          ['offlineTitle', 'offlineTitle'], ['offlineCopy', 'offlineCopy']
+        ]) setText(id, key);
+
+        document.getElementById('setupHeading').firstChild.nodeValue = `${tr('setupHeading')} `;
+        document.getElementById('crosshairHeading').firstChild.nodeValue = `${tr('crosshairHeading')} `;
+        document.getElementById('performanceHeading').firstChild.nodeValue = `${tr('performance')} `;
+        document.querySelectorAll('.mode-title').forEach((element, index) => element.textContent = tr(['gridshot', 'tracking', 'reflex'][index]));
+        document.querySelectorAll('.mode-copy').forEach((element, index) => element.textContent = tr(['gridCopy', 'trackingCopy', 'reflexCopy'][index]));
+        [...durationSelect.options].forEach((option, index) => option.textContent = tr(['duration30', 'duration60', 'duration90'][index]));
+        [...displayModeSelect.options].forEach(option => option.textContent = tr(option.value === 'windowed' ? 'modeWindowed' : option.value === 'fullscreen' ? 'modeFullscreen' : 'modeBorderless'));
+        modeButtons.forEach(button => button.setAttribute('aria-label', `${modeLabel(button.dataset.mode)}: ${tr(({ grid: 'gridCopy', micro: 'trackingCopy', reflex: 'reflexCopy' })[button.dataset.mode])}`));
+        crosshairStyleButtons.forEach(button => button.setAttribute('aria-label', tr(`style${button.dataset.crosshairStyle[0].toUpperCase()}${button.dataset.crosshairStyle.slice(1)}`)));
+        crosshairColorButtons.forEach(button => button.setAttribute('aria-label', tr(`color${button.dataset.crosshairColor === '#c6f36a' ? 'Lime' : button.dataset.crosshairColor === '#79cde0' ? 'Cyan' : button.dataset.crosshairColor === '#fa795f' ? 'Coral' : 'White'}`)));
+        customCrosshairColor.setAttribute('aria-label', tr('customColor'));
+        playerNameInput.setAttribute('aria-label', tr('playerName'));
+        canvas.setAttribute('aria-label', tr('drill'));
+        durationSelect.setAttribute('aria-label', tr('duration'));
+        languageSelect.setAttribute('aria-label', tr('language'));
+        displayModeSelect.setAttribute('aria-label', tr('displayMode'));
+        resizeArenaInput.setAttribute('aria-label', tr('resizable'));
+        sizeInput.setAttribute('aria-label', tr('targetSize'));
+        sensitivityInput.setAttribute('aria-label', tr('sensitivity'));
+        reflexSpeedInput.setAttribute('aria-label', tr('markerSpeed'));
+        crosshairSizeInput.setAttribute('aria-label', tr('crosshairSize'));
+        crosshairGapInput.setAttribute('aria-label', tr('crosshairGap'));
+        centerDotInput.setAttribute('aria-label', tr('centerDot'));
+        document.getElementById('crosshairStyleGroup').setAttribute('aria-label', tr('crosshairStyles'));
+        document.getElementById('crosshairColorGroup').setAttribute('aria-label', tr('colorPresets'));
+        document.getElementById('practiceSetup').setAttribute('aria-label', tr('practiceSetup'));
+        document.getElementById('practiceArea').setAttribute('aria-label', tr('practiceArea'));
+        document.getElementById('performanceArea').setAttribute('aria-label', tr('performanceArea'));
+        document.querySelector('.key-hint').innerHTML = tr('keyHint');
+        updateMetricLabels();
+        ui.mode.textContent = modeLabel(selectedMode);
+        ui.best.textContent = formatBest(storedBest, selectedMode);
+        if (running && paused) {
+          ui.statusText.textContent = tr('paused');
+          ui.title.textContent = tr('pauseTitle');
+          ui.copy.textContent = tr('pauseCopy');
+          startButton.textContent = tr('resume');
+        } else if (running) {
+          ui.statusText.textContent = tr('live');
+        } else if (sessionCompleted) {
+          ui.statusText.textContent = tr('completed');
+          ui.kicker.textContent = `${modeLabel(selectedMode).toUpperCase()} / ${language === 'es' ? 'COMPLETADO' : 'COMPLETE'}`;
+          ui.title.textContent = selectedMode === 'micro' ? tr('trackingResult', { accuracy: Number(ui.accuracy.textContent), time: (trackingMs / 1000).toFixed(1), streak: (bestTrackingMs / 1000).toFixed(1) }) : tr('clickResult', { hits, accuracy: Number(ui.accuracy.textContent) });
+          ui.copy.textContent = selectedMode === 'micro' ? tr('trackingSummary', { time: (trackingMs / 1000).toFixed(1), streak: (bestTrackingMs / 1000).toFixed(1) }) : tr('clickSummary', { streak: bestStreak });
+          startButton.textContent = tr('runAgain');
+        } else {
+          ui.statusText.textContent = tr('ready');
+          ui.kicker.textContent = tr('kicker');
+          ui.title.textContent = tr('overlayTitle');
+          ui.copy.textContent = selectedMode === 'micro' ? tr('trackingCopyLong') : tr('overlayCopy');
+          startButton.textContent = tr('start');
+        }
+        ui.note.textContent = selectedMode === 'micro' ? tr('trackingNote') : tr('sessionNote', { duration: durationSelect.value });
+        pauseButton.textContent = running && paused ? tr('resume') : tr('pause');
+        document.getElementById('restartButton').textContent = tr('restart');
+        renderLeaderboard();
+      }
+      const modes = {
+        grid: { name: 'Gridshot', count: 3, ttl: 0, size: 1 },
+        micro: { name: 'Tracking', count: 1, ttl: 0, size: .62 },
+        reflex: { name: 'Reflex', count: 1, ttl: 1050, size: 1.15 }
+      };
+      let selectedMode = 'grid';
+      let targets = [];
+      let running = false;
+      let paused = false;
+      let sessionCompleted = false;
+      let endAt = 0;
+      let remainingMs = 60000;
+      let rafId = 0;
+      let timerId = 0;
+      let hits = 0;
+      let misses = 0;
+      let streak = 0;
+      let bestStreak = 0;
+      let reactionTotal = 0;
+      let lastFrame = 0;
+      let lastTickAt = 0;
+      let lastMetricsAt = 0;
+      let trackingMs = 0;
+      let offTargetMs = 0;
+      let trackingStreakMs = 0;
+      let bestTrackingMs = 0;
+      let pointerX = -1000;
+      let pointerY = -1000;
+      let aimX = 0;
+      let aimY = 0;
+      let pointerActive = false;
+      let previousClientX = null;
+      let previousClientY = null;
+      let toastTimer = 0;
+      let width = 0;
+      let height = 0;
+      let targetRadius = Number(sizeInput.value);
+      let mouseSensitivity = 1;
+      let reflexSpeed = 1;
+      let crosshairStyle = 'cross';
+      let crosshairColor = '#c6f36a';
+      let crosshairSize = 8;
+      let crosshairGap = 5;
+      let centerDotEnabled = true;
+      let language = 'en';
+      let displayMode = 'windowed-fullscreen';
+      let arenaResizable = false;
+      let savedArenaHeight = 0;
+      let savedArenaWidth = 0;
+      try {
+        const savedLanguage = localStorage.getItem('hidan-language');
+        if (savedLanguage === 'en' || savedLanguage === 'es') language = savedLanguage;
+        const savedDisplayMode = localStorage.getItem('hidan-display-mode');
+        if (['windowed', 'windowed-fullscreen', 'fullscreen'].includes(savedDisplayMode)) displayMode = savedDisplayMode;
+        arenaResizable = localStorage.getItem('hidan-arena-resizable') === 'true';
+        const heightValue = Number(localStorage.getItem('hidan-arena-height'));
+        if (Number.isFinite(heightValue) && heightValue >= 320 && heightValue <= window.innerHeight * .8) savedArenaHeight = heightValue;
+        const widthValue = Number(localStorage.getItem('hidan-arena-width'));
+        if (Number.isFinite(widthValue) && widthValue >= 320 && widthValue <= window.innerWidth * .9) savedArenaWidth = widthValue;
+      } catch (_) { /* Local storage can be disabled. */ }
+      let leaderboardRecords = [];
+      try {
+        const savedSensitivity = localStorage.getItem('hidan-mouse-sensitivity');
+        if (savedSensitivity !== null && Number.isFinite(Number(savedSensitivity))) mouseSensitivity = Math.min(8, Math.max(.5, Number(savedSensitivity)));
+      } catch (_) { /* Local storage can be disabled. */ }
+      try {
+        const savedReflexSpeed = localStorage.getItem('hidan-reflex-speed');
+        if (savedReflexSpeed !== null && Number.isFinite(Number(savedReflexSpeed))) reflexSpeed = Math.min(2, Math.max(.5, Number(savedReflexSpeed)));
+      } catch (_) { /* Local storage can be disabled. */ }
+      try {
+        const savedStyle = localStorage.getItem('hidan-crosshair-style');
+        const savedColor = localStorage.getItem('hidan-crosshair-color');
+        const savedSize = localStorage.getItem('hidan-crosshair-size');
+        const savedGap = localStorage.getItem('hidan-crosshair-gap');
+        const savedCenterDot = localStorage.getItem('hidan-crosshair-center-dot');
+        if (['cross', 'dot', 'ring', 'x'].includes(savedStyle)) crosshairStyle = savedStyle;
+        if (/^#[0-9a-f]{6}$/i.test(savedColor || '')) crosshairColor = savedColor;
+        if (savedSize !== null && Number.isFinite(Number(savedSize)) && Number(savedSize) >= 4 && Number(savedSize) <= 20) crosshairSize = Number(savedSize);
+        if (savedGap !== null && Number.isFinite(Number(savedGap)) && Number(savedGap) >= 0 && Number(savedGap) <= 14) crosshairGap = Number(savedGap);
+        if (savedCenterDot !== null) centerDotEnabled = savedCenterDot === 'true';
+      } catch (_) { /* Local storage can be disabled. */ }
+      sensitivityInput.value = String(mouseSensitivity);
+      sensitivityValue.textContent = `${mouseSensitivity.toFixed(1)}x`;
+      reflexSpeedInput.value = String(reflexSpeed);
+      reflexSpeedValue.textContent = `${reflexSpeed.toFixed(1)}x`;
+      customCrosshairColor.value = crosshairColor;
+      crosshairSizeInput.value = String(crosshairSize);
+      crosshairSizeValue.textContent = `${crosshairSize} px`;
+      crosshairGapInput.value = String(crosshairGap);
+      crosshairGapValue.textContent = `${crosshairGap} px`;
+      centerDotInput.checked = centerDotEnabled;
+      languageSelect.value = language;
+      displayModeSelect.value = displayMode;
+      resizeArenaInput.checked = arenaResizable;
+      if (savedArenaHeight) frame.style.height = `${savedArenaHeight}px`;
+      if (savedArenaWidth) frame.style.width = `${savedArenaWidth}px`;
+      crosshairStyleButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.crosshairStyle === crosshairStyle)));
+      crosshairColorButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.crosshairColor === crosshairColor.toLowerCase())));
+      crosshairGapInput.disabled = crosshairStyle === 'dot';
+      centerDotInput.disabled = crosshairStyle === 'dot';
+      function bestKey(mode = selectedMode) { return `hidan-best-${mode === 'micro' ? 'tracking' : mode}`; }
+      function readBest(mode = selectedMode) {
+        try { return Number(localStorage.getItem(bestKey(mode)) || 0); } catch (_) { return 0; }
+      }
+      function formatBest(score, mode = selectedMode) {
+        return mode === 'micro' ? `${Number(score).toFixed(1)} s` : `${score} ${tr('hits').toLowerCase()}`;
+      }
+      function readLeaderboard() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem('hidan-leaderboard') || '[]');
+          return Array.isArray(parsed) ? parsed.filter(record => modes[record.mode] && Number.isFinite(Number(record.score))) : [];
+        } catch (_) { return []; }
+      }
+      function persistLeaderboard() {
+        try { localStorage.setItem('hidan-leaderboard', JSON.stringify(leaderboardRecords)); } catch (_) { /* Local storage can be disabled. */ }
+        if (window.chrome?.webview) {
+          window.chrome.webview.postMessage(JSON.stringify({ type: 'save-leaderboard', records: leaderboardRecords }));
+        }
+      }
+      function renderLeaderboard() {
+        const modeName = modeLabel(selectedMode);
+        leaderboardTitle.textContent = tr('topFive', { mode: modeName });
+        leaderboardList.replaceChildren();
+        const records = leaderboardRecords.filter(record => record.mode === selectedMode)
+          .sort((a, b) => Number(b.score) - Number(a.score) || Number(b.accuracy) - Number(a.accuracy))
+          .slice(0, 5);
+        if (records.length === 0) {
+          const empty = document.createElement('li');
+          empty.className = 'leaderboard-empty';
+          empty.textContent = tr('emptyLeaderboard');
+          leaderboardList.append(empty);
+          return;
+        }
+        records.forEach((record, index) => {
+          const row = document.createElement('li');
+          row.className = 'leaderboard-row';
+          const rank = document.createElement('span');
+          rank.className = 'leaderboard-rank';
+          rank.textContent = String(index + 1).padStart(2, '0');
+          const player = document.createElement('div');
+          player.className = 'leaderboard-player';
+          const name = document.createElement('div');
+          name.textContent = record.player || 'Player';
+          const detail = document.createElement('div');
+          detail.className = 'leaderboard-detail';
+          detail.textContent = selectedMode === 'micro'
+            ? tr('leaderTrackingDetail', { accuracy: Number(record.accuracy) || 0, misses: Number(record.misses || 0).toFixed(1) })
+            : tr('leaderDetail', { accuracy: Number(record.accuracy) || 0, misses: Number(record.misses) || 0, reaction: Number(record.reactionMs) || 0 });
+          player.append(name, detail);
+          const score = document.createElement('span');
+          score.className = 'leaderboard-score';
+          score.textContent = selectedMode === 'micro' ? `${Number(record.score).toFixed(1)} s` : `${Number(record.score)} pts`;
+          row.append(rank, player, score);
+          leaderboardList.append(row);
+        });
+      }
+      function saveCompletedRun(accuracy) {
+        const player = playerNameInput.value.trim().slice(0, 24) || tr('playerFallback');
+        const isTracking = selectedMode === 'micro';
+        const score = isTracking ? Number((trackingMs / 1000).toFixed(1)) : hits;
+        const record = {
+          mode: selectedMode,
+          player,
+          score,
+          accuracy,
+          misses: isTracking ? Number((offTargetMs / 1000).toFixed(1)) : misses,
+          reactionMs: isTracking || !hits ? 0 : Math.round(reactionTotal / hits),
+          playedAt: new Date().toISOString()
+        };
+        const modeRecords = leaderboardRecords.filter(item => item.mode === selectedMode);
+        modeRecords.push(record);
+        const topFive = modeRecords.sort((a, b) => Number(b.score) - Number(a.score) || Number(b.accuracy) - Number(a.accuracy)).slice(0, 5);
+        leaderboardRecords = leaderboardRecords.filter(item => item.mode !== selectedMode).concat(topFive);
+        persistLeaderboard();
+        renderLeaderboard();
+      }
+      let storedBest = readBest();
+      leaderboardRecords = readLeaderboard();
+      try { playerNameInput.value = localStorage.getItem('hidan-player-name') || 'Player'; } catch (_) { /* Local storage can be disabled. */ }
+      ui.best.textContent = formatBest(storedBest);
+      renderLeaderboard();
+      if (window.chrome?.webview) {
+        window.chrome.webview.addEventListener('message', event => {
+          if (event.data?.type !== 'leaderboard-loaded' || !Array.isArray(event.data.records)) return;
+          leaderboardRecords = event.data.records.filter(record => modes[record.mode] && Number.isFinite(Number(record.score)));
+          try { localStorage.setItem('hidan-leaderboard', JSON.stringify(leaderboardRecords)); } catch (_) { /* Local storage can be disabled. */ }
+          renderLeaderboard();
+        });
+        window.chrome.webview.postMessage('load-leaderboard');
+      }
+
+      function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = rect.width;
+        height = rect.height;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        targets = targets.map(target => ({ ...target, x: Math.min(Math.max(target.x, target.r), width - target.r), y: Math.min(Math.max(target.y, target.r), height - target.r) }));
+        draw();
+      }
+
+      function formatTime(milliseconds) {
+        const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
+        return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+      }
+
+      function targetSize() { return targetRadius * modes[selectedMode].size; }
+
+      function spawnTarget() {
+        if (!width || !height || !running || paused) return;
+        const radius = Math.max(10, targetSize());
+        const margin = radius + 12;
+        const tracking = selectedMode === 'micro';
+        const x = margin + Math.random() * Math.max(1, width - margin * 2);
+        const y = margin + Math.random() * Math.max(1, height - margin * 2);
+        const phase = Math.random() * Math.PI * 2;
+        const speed = tracking ? 130 + Math.random() * 370 : 0;
+        const colors = ['#c6f36a', '#79cde0', '#fa795f'];
+        const bornAt = performance.now();
+        const lifetime = modes[selectedMode].ttl ? modes[selectedMode].ttl / reflexSpeed : Infinity;
+        targets.push({ x, y, waypointX: x, waypointY: y, speed, nextSpeedChangeAt: bornAt + 500 + Math.random() * 1200, r: radius, bornAt, expiresAt: bornAt + lifetime, color: colors[(hits + misses) % colors.length], phase });
+      }
+
+      function fillTargets() {
+        const desired = modes[selectedMode].count;
+        while (targets.length < desired) spawnTarget();
+      }
+
+      function drawAimReticle() {
+        if (!pointerActive) return;
+        context.save();
+        context.translate(pointerX, pointerY);
+        context.lineCap = 'round';
+        context.beginPath();
+        if (crosshairStyle === 'cross') {
+          const outer = crosshairGap + crosshairSize;
+          context.moveTo(-outer, 0); context.lineTo(-crosshairGap, 0);
+          context.moveTo(crosshairGap, 0); context.lineTo(outer, 0);
+          context.moveTo(0, -outer); context.lineTo(0, -crosshairGap);
+          context.moveTo(0, crosshairGap); context.lineTo(0, outer);
+        } else if (crosshairStyle === 'x') {
+          const inner = crosshairGap * Math.SQRT1_2;
+          const outer = inner + crosshairSize;
+          context.moveTo(-outer, -outer); context.lineTo(-inner, -inner);
+          context.moveTo(inner, inner); context.lineTo(outer, outer);
+          context.moveTo(outer, -outer); context.lineTo(inner, -inner);
+          context.moveTo(-inner, inner); context.lineTo(-outer, outer);
+        } else if (crosshairStyle === 'ring') {
+          context.arc(0, 0, crosshairGap + crosshairSize / 2, 0, Math.PI * 2);
+        }
+        if (crosshairStyle !== 'dot') {
+          context.lineWidth = 4;
+          context.strokeStyle = 'rgba(12,16,13,.82)';
+          context.stroke();
+          context.lineWidth = 1.75;
+          context.strokeStyle = crosshairColor;
+          context.stroke();
+        }
+        if (crosshairStyle === 'dot') {
+          context.beginPath();
+          context.arc(0, 0, Math.max(2, crosshairSize / 2), 0, Math.PI * 2);
+          context.fillStyle = 'rgba(12,16,13,.82)';
+          context.fill();
+          context.beginPath();
+          context.arc(0, 0, 2.5, 0, Math.PI * 2);
+          context.fillStyle = crosshairColor;
+          context.fill();
+        } else if (centerDotEnabled) {
+          context.beginPath();
+          context.arc(0, 0, Math.min(3, Math.max(1.4, crosshairSize * .18)), 0, Math.PI * 2);
+          context.fillStyle = crosshairColor;
+          context.fill();
+        }
+        context.restore();
+      }
+
+      function draw() {
+        if (!context) return;
+        context.clearRect(0, 0, width, height);
+        const now = performance.now();
+        for (const target of targets) {
+          const pulse = 1 + Math.sin(now / 180 + target.phase) * .035;
+          const radius = target.r * pulse;
+          context.save();
+          context.shadowColor = target.color;
+          context.shadowBlur = 20;
+          context.beginPath();
+          context.arc(target.x, target.y, radius, 0, Math.PI * 2);
+          context.fillStyle = target.color;
+          context.fill();
+          context.shadowBlur = 0;
+          context.beginPath();
+          context.arc(target.x, target.y, radius * .69, 0, Math.PI * 2);
+          context.strokeStyle = 'rgba(23,26,23,.74)';
+          context.lineWidth = 2;
+          context.stroke();
+          context.beginPath();
+          context.arc(target.x, target.y, radius * .34, 0, Math.PI * 2);
+          context.fillStyle = '#171a17';
+          context.fill();
+          context.restore();
+        }
+        drawAimReticle();
+      }
+
+      function updateMetrics() {
+        if (selectedMode === 'micro') {
+          const elapsed = trackingMs + offTargetMs;
+          ui.accuracy.textContent = elapsed ? Math.round(trackingMs / elapsed * 100) : 0;
+          ui.hits.textContent = (trackingMs / 1000).toFixed(1);
+          ui.misses.textContent = (offTargetMs / 1000).toFixed(1);
+          ui.reaction.textContent = bestTrackingMs ? (bestTrackingMs / 1000).toFixed(1) : '--';
+          ui.reactionUnit.textContent = ' s';
+          ui.streak.textContent = (trackingStreakMs / 1000).toFixed(1);
+          return;
+        }
+        const total = hits + misses;
+        ui.hits.textContent = hits;
+        ui.misses.textContent = misses;
+        ui.streak.textContent = streak;
+        ui.accuracy.textContent = total ? Math.round(hits / total * 100) : 0;
+        ui.reaction.textContent = hits ? Math.round(reactionTotal / hits) : '--';
+        ui.reactionUnit.textContent = ' ms';
+      }
+
+      function setMode(mode) {
+        if (!modes[mode] || mode === selectedMode) return;
+        const interruptedSession = running;
+        selectedMode = mode;
+        modeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+        ui.mode.textContent = modeLabel(mode);
+        storedBest = readBest(mode);
+        ui.best.textContent = formatBest(storedBest, mode);
+        reflexSpeedControl.hidden = mode !== 'reflex';
+        updateMetricLabels();
+        resetSession();
+        renderLeaderboard();
+        if (interruptedSession) showToast(tr('modeResetToast', { mode: modeLabel(mode) }));
+      }
+
+      function resetSession(keepOverlay = true) {
+        running = false;
+        paused = false;
+        sessionCompleted = false;
+        cancelAnimationFrame(rafId);
+        clearInterval(timerId);
+        targets = [];
+        hits = 0;
+        misses = 0;
+        streak = 0;
+        bestStreak = 0;
+        reactionTotal = 0;
+        trackingMs = 0;
+        offTargetMs = 0;
+        trackingStreakMs = 0;
+        bestTrackingMs = 0;
+        remainingMs = Number(durationSelect.value) * 1000;
+        ui.time.textContent = formatTime(remainingMs);
+        ui.status.classList.remove('active');
+        ui.statusText.textContent = tr('ready');
+        pauseButton.disabled = true;
+        pauseButton.textContent = tr('pause');
+        ui.note.textContent = selectedMode === 'micro' ? tr('trackingNote') : tr('sessionNote', { duration: durationSelect.value });
+        updateMetrics();
+        draw();
+        if (keepOverlay) {
+          ui.kicker.textContent = tr('kicker');
+          ui.title.textContent = tr('overlayTitle');
+          ui.copy.textContent = selectedMode === 'micro' ? tr('trackingCopyLong') : tr('overlayCopy');
+          startButton.textContent = tr('start');
+          overlay.hidden = false;
+        }
+        ui.note.textContent = selectedMode === 'micro' ? tr('trackingNote') : tr('sessionNote', { duration: durationSelect.value });
+      }
+
+      function finishSession() {
+        running = false;
+        paused = false;
+        sessionCompleted = true;
+        cancelAnimationFrame(rafId);
+        clearInterval(timerId);
+        targets = [];
+        draw();
+        ui.status.classList.remove('active');
+        ui.statusText.textContent = tr('completed');
+        pauseButton.disabled = true;
+        const total = hits + misses;
+        const accuracy = selectedMode === 'micro' ? Number(ui.accuracy.textContent) : (total ? Math.round(hits / total * 100) : 0);
+        const score = selectedMode === 'micro' ? Number((trackingMs / 1000).toFixed(1)) : hits;
+        if (score > storedBest) {
+          storedBest = score;
+          try { localStorage.setItem(bestKey(), String(storedBest)); } catch (_) { /* Local storage can be disabled. */ }
+          ui.best.textContent = formatBest(storedBest);
+        }
+        saveCompletedRun(accuracy);
+        ui.kicker.textContent = `${modeLabel(selectedMode).toUpperCase()} / ${language === 'es' ? 'COMPLETADO' : 'COMPLETE'}`;
+        ui.title.textContent = selectedMode === 'micro' ? tr('trackingResult', { accuracy, time: (trackingMs / 1000).toFixed(1), streak: (bestTrackingMs / 1000).toFixed(1) }) : tr('clickResult', { hits, accuracy, streak: bestStreak });
+        ui.copy.textContent = selectedMode === 'micro'
+          ? tr('trackingSummary', { time: (trackingMs / 1000).toFixed(1), streak: (bestTrackingMs / 1000).toFixed(1) })
+          : tr('clickSummary', { streak: bestStreak });
+        startButton.textContent = tr('runAgain');
+        overlay.hidden = false;
+      }
+
+      function tick() {
+        if (!running || paused) return;
+        const now = performance.now();
+        const elapsed = Math.min(100, Math.max(0, now - lastTickAt));
+        lastTickAt = now;
+        if (selectedMode === 'micro') {
+          const target = targets[0];
+          if (target) {
+            const margin = target.r + 12;
+            if (now >= target.nextSpeedChangeAt) {
+              target.speed = 130 + Math.random() * 370;
+              target.nextSpeedChangeAt = now + 500 + Math.random() * 1200;
+            }
+            const distanceX = target.waypointX - target.x;
+            const distanceY = target.waypointY - target.y;
+            const distance = Math.hypot(distanceX, distanceY);
+            const travel = target.speed * elapsed / 1000;
+            if (distance <= travel) {
+              target.x = target.waypointX;
+              target.y = target.waypointY;
+              target.waypointX = margin + Math.random() * Math.max(1, width - margin * 2);
+              target.waypointY = margin + Math.random() * Math.max(1, height - margin * 2);
+            } else if (distance > 0) {
+              target.x += distanceX / distance * travel;
+              target.y += distanceY / distance * travel;
+            }
+            if (pointerActive && Math.hypot(pointerX - target.x, pointerY - target.y) <= target.r) {
+              trackingMs += elapsed;
+              trackingStreakMs += elapsed;
+              bestTrackingMs = Math.max(bestTrackingMs, trackingStreakMs);
+            } else {
+              offTargetMs += elapsed;
+              trackingStreakMs = 0;
+            }
+          }
+          if (now - lastMetricsAt >= 100) {
+            updateMetrics();
+            lastMetricsAt = now;
+          }
+        }
+        const expired = targets.filter(target => target.expiresAt <= now);
+        if (expired.length) {
+          misses += expired.length;
+          streak = 0;
+          targets = targets.filter(target => target.expiresAt > now);
+          fillTargets();
+          updateMetrics();
+        }
+        if (now >= endAt) {
+          ui.time.textContent = '00:00';
+          finishSession();
+          return;
+        }
+        const left = endAt - now;
+        ui.time.textContent = formatTime(left);
+        if (selectedMode === 'micro' || now - lastFrame > 100) {
+          draw();
+          lastFrame = now;
+        }
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function startSession() {
+        if (running && paused) {
+          paused = false;
+          endAt = performance.now() + remainingMs;
+          lastTickAt = performance.now();
+          ui.statusText.textContent = tr('live');
+          pauseButton.textContent = tr('pause');
+          overlay.hidden = true;
+          lastFrame = 0;
+          rafId = requestAnimationFrame(tick);
+          timerId = setInterval(() => { if (running && !paused) ui.time.textContent = formatTime(endAt - performance.now()); }, 100);
+          return;
+        }
+        resetSession(false);
+        running = true;
+        remainingMs = Number(durationSelect.value) * 1000;
+        endAt = performance.now() + remainingMs;
+        lastTickAt = performance.now();
+        lastMetricsAt = lastTickAt;
+        overlay.hidden = true;
+        ui.status.classList.add('active');
+        ui.statusText.textContent = tr('live');
+        pauseButton.disabled = false;
+        fillTargets();
+        lastFrame = 0;
+        rafId = requestAnimationFrame(tick);
+        timerId = setInterval(() => {
+          if (running && !paused) ui.time.textContent = formatTime(endAt - performance.now());
+        }, 100);
+      }
+
+      function togglePause() {
+        if (!running) return;
+        if (paused) {
+          startSession();
+          return;
+        }
+        paused = true;
+        remainingMs = Math.max(0, endAt - performance.now());
+        clearInterval(timerId);
+        cancelAnimationFrame(rafId);
+        ui.statusText.textContent = tr('paused');
+        pauseButton.textContent = tr('resume');
+        ui.kicker.textContent = language === 'es' ? 'TÓMATE TU TIEMPO' : 'TAKE YOUR TIME';
+        ui.title.textContent = tr('pauseTitle');
+        ui.copy.textContent = tr('pauseCopy');
+        startButton.textContent = tr('resume');
+        overlay.hidden = false;
+      }
+
+      function handleArenaClick(event) {
+        if (!running || paused) return;
+        if (selectedMode === 'micro') return;
+        if (!pointerActive) updateAim(event);
+        const x = aimX;
+        const y = aimY;
+        const index = targets.findIndex(target => Math.hypot(target.x - x, target.y - y) <= target.r);
+        if (index >= 0) {
+          const [target] = targets.splice(index, 1);
+          hits += 1;
+          streak += 1;
+          bestStreak = Math.max(bestStreak, streak);
+          reactionTotal += performance.now() - target.bornAt;
+          fillTargets();
+        } else {
+          misses += 1;
+          streak = 0;
+        }
+        updateMetrics();
+        draw();
+      }
+
+      function showToast(message) {
+        ui.toast.textContent = message;
+        ui.toast.classList.add('visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => ui.toast.classList.remove('visible'), 1800);
+      }
+
+      modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
+      startButton.addEventListener('click', startSession);
+      pauseButton.addEventListener('click', togglePause);
+      document.getElementById('restartButton').addEventListener('click', () => startSession());
+      document.getElementById('resetStats').addEventListener('click', () => {
+        try { Object.keys(localStorage).filter(key => key.startsWith('hidan-best-')).forEach(key => localStorage.removeItem(key)); } catch (_) { /* Local storage can be disabled. */ }
+        storedBest = 0;
+        ui.best.textContent = formatBest(0);
+        leaderboardRecords = [];
+        persistLeaderboard();
+        renderLeaderboard();
+        showToast(tr('clearToast'));
+      });
+      playerNameInput.addEventListener('change', () => {
+        const player = playerNameInput.value.trim().slice(0, 24) || tr('playerFallback');
+        playerNameInput.value = player;
+        try { localStorage.setItem('hidan-player-name', player); } catch (_) { /* Local storage can be disabled. */ }
+      });
+      durationSelect.addEventListener('change', () => {
+        if (!running) resetSession();
+      });
+      sizeInput.addEventListener('input', () => {
+        targetRadius = Number(sizeInput.value);
+        document.getElementById('sizeValue').textContent = targetRadius;
+        if (running && !paused) {
+          targets = [];
+          fillTargets();
+          draw();
+        }
+      });
+      sensitivityInput.addEventListener('input', () => {
+        mouseSensitivity = Number(sensitivityInput.value);
+        sensitivityValue.textContent = `${mouseSensitivity.toFixed(1)}x`;
+        try { localStorage.setItem('hidan-mouse-sensitivity', String(mouseSensitivity)); } catch (_) { /* Local storage can be disabled. */ }
+      });
+      reflexSpeedInput.addEventListener('input', () => {
+        reflexSpeed = Number(reflexSpeedInput.value);
+        reflexSpeedValue.textContent = `${reflexSpeed.toFixed(1)}x`;
+        try { localStorage.setItem('hidan-reflex-speed', String(reflexSpeed)); } catch (_) { /* Local storage can be disabled. */ }
+        if (running && !paused && selectedMode === 'reflex') {
+          const lifetime = modes.reflex.ttl / reflexSpeed;
+          for (const target of targets) target.expiresAt = target.bornAt + lifetime;
+        }
+      });
+      crosshairStyleButtons.forEach(button => button.addEventListener('click', () => {
+        crosshairStyle = button.dataset.crosshairStyle;
+        crosshairStyleButtons.forEach(styleButton => styleButton.setAttribute('aria-pressed', String(styleButton === button)));
+        crosshairGapInput.disabled = crosshairStyle === 'dot';
+        centerDotInput.disabled = crosshairStyle === 'dot';
+        try { localStorage.setItem('hidan-crosshair-style', crosshairStyle); } catch (_) { /* Local storage can be disabled. */ }
+        draw();
+      }));
+      function setCrosshairColor(color) {
+        if (!/^#[0-9a-f]{6}$/i.test(color)) return;
+        crosshairColor = color.toLowerCase();
+        customCrosshairColor.value = crosshairColor;
+        crosshairColorButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.crosshairColor === crosshairColor)));
+        try { localStorage.setItem('hidan-crosshair-color', crosshairColor); } catch (_) { /* Local storage can be disabled. */ }
+        draw();
+      }
+      crosshairColorButtons.forEach(button => button.addEventListener('click', () => setCrosshairColor(button.dataset.crosshairColor)));
+      customCrosshairColor.addEventListener('input', () => setCrosshairColor(customCrosshairColor.value));
+      crosshairSizeInput.addEventListener('input', () => {
+        crosshairSize = Number(crosshairSizeInput.value);
+        crosshairSizeValue.textContent = `${crosshairSize} px`;
+        try { localStorage.setItem('hidan-crosshair-size', String(crosshairSize)); } catch (_) { /* Local storage can be disabled. */ }
+        draw();
+      });
+      crosshairGapInput.addEventListener('input', () => {
+        crosshairGap = Number(crosshairGapInput.value);
+        crosshairGapValue.textContent = `${crosshairGap} px`;
+        try { localStorage.setItem('hidan-crosshair-gap', String(crosshairGap)); } catch (_) { /* Local storage can be disabled. */ }
+        draw();
+      });
+      centerDotInput.addEventListener('change', () => {
+        centerDotEnabled = centerDotInput.checked;
+        try { localStorage.setItem('hidan-crosshair-center-dot', String(centerDotEnabled)); } catch (_) { /* Local storage can be disabled. */ }
+        draw();
+      });
+      languageSelect.addEventListener('change', () => {
+        language = languageSelect.value === 'es' ? 'es' : 'en';
+        try { localStorage.setItem('hidan-language', language); } catch (_) { /* Local storage can be disabled. */ }
+        applyLanguage();
+      });
+      displayModeSelect.addEventListener('change', () => {
+        displayMode = displayModeSelect.value;
+        try { localStorage.setItem('hidan-display-mode', displayMode); } catch (_) { /* Local storage can be disabled. */ }
+        if (window.chrome?.webview) window.chrome.webview.postMessage(JSON.stringify({ type: 'set-display-mode', mode: displayMode }));
+        else showToast(tr('nativeDisplayOnly'));
+      });
+      function applyArenaResizable() {
+        frame.classList.toggle('resizable', arenaResizable);
+        if (arenaResizable) {
+          frame.style.height = `${savedArenaHeight || Math.round(frame.getBoundingClientRect().height)}px`;
+          frame.style.width = `${savedArenaWidth || Math.round(frame.getBoundingClientRect().width)}px`;
+        } else {
+          frame.style.height = '';
+          frame.style.width = '';
+        }
+      }
+      resizeArenaInput.addEventListener('change', () => {
+        arenaResizable = resizeArenaInput.checked;
+        try { localStorage.setItem('hidan-arena-resizable', String(arenaResizable)); } catch (_) { /* Local storage can be disabled. */ }
+        applyArenaResizable();
+      });
+      frame.addEventListener('pointerup', () => {
+        if (!arenaResizable) return;
+        savedArenaHeight = Math.round(frame.getBoundingClientRect().height);
+        savedArenaWidth = Math.round(frame.getBoundingClientRect().width);
+        try {
+          localStorage.setItem('hidan-arena-height', String(savedArenaHeight));
+          localStorage.setItem('hidan-arena-width', String(savedArenaWidth));
+        } catch (_) { /* Local storage can be disabled. */ }
+      });
+      canvas.addEventListener('pointerdown', handleArenaClick);
+      function updateAim(event) {
+        const rect = canvas.getBoundingClientRect();
+        if (previousClientX === null || previousClientY === null) {
+          aimX = event.clientX - rect.left;
+          aimY = event.clientY - rect.top;
+        } else {
+          aimX += (event.clientX - previousClientX) * mouseSensitivity;
+          aimY += (event.clientY - previousClientY) * mouseSensitivity;
+        }
+        aimX = Math.max(0, Math.min(width, aimX));
+        aimY = Math.max(0, Math.min(height, aimY));
+        previousClientX = event.clientX;
+        previousClientY = event.clientY;
+        pointerActive = true;
+        pointerX = aimX;
+        pointerY = aimY;
+        draw();
+      }
+      canvas.addEventListener('pointermove', updateAim);
+      canvas.addEventListener('pointerleave', () => {
+        previousClientX = null;
+        previousClientY = null;
+        pointerActive = false;
+        pointerX = -1000;
+        pointerY = -1000;
+        draw();
+      });
+      window.addEventListener('keydown', event => {
+        if (event.code === 'F11' && window.chrome?.webview) {
+          event.preventDefault();
+          window.chrome.webview.postMessage('toggle-fullscreen');
+          return;
+        }
+        if (event.repeat || event.target.matches('input, select, textarea, button')) return;
+        if (event.code === 'Space') {
+          event.preventDefault();
+          if (running) togglePause(); else startSession();
+        } else if (event.key.toLowerCase() === 'r') {
+          startSession();
+        }
+      });
+      if (window.chrome?.webview) {
+        window.chrome.webview.addEventListener('message', event => {
+          if (event.data?.type === 'display-mode-changed' && ['windowed', 'windowed-fullscreen', 'fullscreen'].includes(event.data.mode)) {
+            displayMode = event.data.mode;
+            displayModeSelect.value = displayMode;
+            try { localStorage.setItem('hidan-display-mode', displayMode); } catch (_) { /* Local storage can be disabled. */ }
+          }
+        });
+      }
+      if ('ResizeObserver' in window) new ResizeObserver(resizeCanvas).observe(frame);
+      else window.addEventListener('resize', resizeCanvas);
+      applyLanguage();
+      applyArenaResizable();
+      if (window.chrome?.webview) window.chrome.webview.postMessage(JSON.stringify({ type: 'set-display-mode', mode: displayMode }));
+      resizeCanvas();
+      resetSession();
+    })();
+  </script>
+</body>
+</html>
